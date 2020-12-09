@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<robot name="box">
+
+  <material name="gray">
+    <color rgba="0.5 0.5 0.5 1"/>
+  </material>
+
+
+  <link name="base_link">
+    <visual>
+      <geometry>
+        <box size="0.136 0.065 0.044"/>
+      </geometry>
+      <material name="gray"/>
+    </visual>
+     <collision>
+      <geometry>
+        <box size="0.136 0.065 0.044"/>
+      </geometry>
+    </collision>
+  </link>
+
+  
+
+  <link name="base_motor">
+      <visual>
+      <geometry>
+        <box size="0.01 0.01 0.01"/>
+      </geometry>
+    </visual>
+
+    <inertial>
+      <origin xyz="0.0 0.0 0.0"/> <!-- should mean center of geometry? -->
+      <mass value="0.249"/>
+      <inertia ixx="0.000423964" ixy="0.0" ixz="0.0" iyy="0.00047146" iyz="0.0" izz="0.00012784075"/>
+    </inertial>
+  </link>
+
+  <joint name="base_to_motor" type="fixed">
+    <parent link="base_link"/>
+    <child link="base_motor"/>
+  </joint>
+
+  
+
+    <!-- Gazebo plugin for ROS Control -->
+  <gazebo>
+    <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+      <robotNamespace>/biosentry</robotNamespace>
+    </plugin>
+  </gazebo>
+
+  <transmission name="sim_motor_trans">
+    <type>transmission_interface/SimpleTransmission</type>
+    <actuator name="sim_motor">
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+    <joint name="base_to_motor">
+      <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+    </joint>
+  </transmission>
+
+</robot>
