@@ -4,7 +4,7 @@
   pose_covariance_diagonal: [0.001, 0.001, 0.001, 0.001, 0.001, 0.03]
   twist_covariance_diagonal: [0.001, 0.001, 0.001, 0.001, 0.001, 0.03]
 
-  base_frame_id: base_motor
+  base_frame_id: base_link
 
   # Velocity and acceleration limits for the robot
   linear:

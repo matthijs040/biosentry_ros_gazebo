@@ -1,0 +1,144 @@
+<?xml version="1.0"?>
+<robot name="box_with_camera" xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <material name="gray">
+    <color rgba="0.5 0.5 0.5 1"/>
+  </material>
+
+  <material name="red">
+    <color rgba="0.9 0 0 1"/>
+  </material>
+
+  <!-- sizes in m. -->
+  <xacro:property name="body_length" value="0.136" /> 
+  <xacro:property name="body_width" value="0.65" />
+  <xacro:property name="body_height" value="0.44" />
+
+  <xacro:property name="camera_size" value="0.1" />
+  <xacro:property name="camera_offset_x" value="${body_length/2}"/>
+  <xacro:property name="camera_offset_z" value="${body_height/2}"/>
+
+  <!-- masses in kg. -->
+  <xacro:property name="body_mass" value="0.249" /> 
+
+
+
+
+<!-- =========================== Base link and inertia link =========================== -->
+
+  <link name="base_link">
+    <visual>
+      <geometry>
+        <box size="${body_length} ${body_width} ${body_height}"/>
+      </geometry>
+      <material name="gray"/>
+    </visual>
+     <collision>
+      <geometry>
+        <box size="${body_length} ${body_width} ${body_height}"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="base_to_inertia" type="fixed">
+    <parent link="base_link"/>
+    <child link="inertia"/>
+  </joint>
+
+  <link name="inertia">
+      <visual>
+      <geometry>
+        <box size="${body_length} ${body_width} ${body_height}"/>
+      </geometry>
+    </visual>
+
+    <inertial>
+      <origin xyz="0.0 0.0 0.0"/> <!-- should mean center of geometry? -->
+      <mass value="0.249"/>
+      <inertia ixx="0.000423964" ixy="0.0" ixz="0.0" iyy="0.00047146" iyz="0.0" izz="0.00012784075"/>
+    </inertial>
+  </link>
+
+  <!--  =========================== camera joint, link and gazebo-cam-sensor =========================== -->
+
+  <joint name="base_to_camera" type="fixed">
+    <parent link="base_link"/>
+    <child link="camera_link"/>
+    
+    <axis xyz="0 0 0" rpy="0 0 0" />
+    <origin xyz="${camera_offset_x} 0 ${camera_offset_z}" rpy="0 0 0"/>
+  </joint>
+
+   <link name="camera_link">
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <box size="${camera_size} ${camera_size} ${camera_size}"/>
+        </geometry>
+      </collision>
+
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <box size="${camera_size} ${camera_size} ${camera_size}"/>
+        </geometry>
+        <material name="red"/>
+      </visual>
+
+      <inertial>
+        <mass value="1e-5" />
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6" />
+      </inertial>
+    </link>
+
+  <gazebo reference="camera_link">
+    <sensor type="camera" name="camera1">
+      <update_rate>30.0</update_rate>
+      <camera name="head">
+        <horizontal_fov>1.3962634</horizontal_fov>
+        <image>
+          <width>800</width>
+          <height>800</height>
+          <format>R8G8B8</format>
+        </image>
+        <clip>
+          <near>0.02</near>
+          <far>300</far>
+        </clip>
+        <noise>
+          <type>gaussian</type>
+          <!-- Noise is sampled independently per pixel on each frame.
+               That pixel's noise value is added to each of its color
+               channels, which at that point lie in the range [0,1]. -->
+          <mean>0.0</mean>
+          <stddev>0.007</stddev>
+        </noise>
+      </camera>
+      <plugin name="camera_controller" filename="libgazebo_ros_camera.so">
+        <alwaysOn>true</alwaysOn>
+        <updateRate>0.0</updateRate>
+        <cameraName>biosentry/camera_front</cameraName>
+        <imageTopicName>image_raw</imageTopicName>
+        <cameraInfoTopicName>camera_info</cameraInfoTopicName>
+        <frameName>camera_link</frameName>
+        <hackBaseline>0.07</hackBaseline>
+        <distortionK1>0.0</distortionK1>
+        <distortionK2>0.0</distortionK2>
+        <distortionK3>0.0</distortionK3>
+        <distortionT1>0.0</distortionT1>
+        <distortionT2>0.0</distortionT2>
+      </plugin>
+    </sensor>
+  </gazebo>
+
+  <!-- =========================== Gazebo controller for movement =========================== -->
+  <gazebo>
+    <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+      <robotNamespace>/biosentry</robotNamespace>
+    </plugin>
+  </gazebo>
+
+
+
+</robot>
