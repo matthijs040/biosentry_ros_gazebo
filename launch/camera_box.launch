@@ -1,5 +1,5 @@
 <launch>
-  <arg name="model" default="$(find biosentry_ros_gazebo)/urdf/biosentry/box_with_camera.urdf.xacro"/>
+  <arg name="model" default="$(find biosentry_ros_gazebo)/urdf/biosentry/camera_box.urdf.xacro"/>
   <!-- <arg name="rvizconfig" default="$(find urdf_tutorial)/rviz/urdf.rviz" /> -->
 
   <include file="$(find biosentry_ros_gazebo)/launch/gazebo.launch">
