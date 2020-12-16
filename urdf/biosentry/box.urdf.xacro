@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <robot name="box">
 
-  <material name="gray">
-    <color rgba="0.5 0.5 0.5 1"/>
+  <material name="red">
+    <color rgba="1 0 0 1"/>
   </material>
 
   <link name="base_link">
@@ -10,7 +10,7 @@
       <geometry>
         <box size="0.136 0.065 0.044"/>
       </geometry>
-      <material name="gray"/>
+      <material name="red"/>
     </visual>
      <collision>
       <geometry>
@@ -24,6 +24,7 @@
       <geometry>
         <box size="0.01 0.01 0.01"/>
       </geometry>
+      <material name="red"/>
     </visual>
 
     <inertial>

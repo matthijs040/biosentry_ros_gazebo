@@ -1,20 +1,21 @@
 <?xml version="1.0"?>
-<robot name="box_with_camera" xmlns:xacro="http://ros.org/wiki/xacro">
+<robot name="box" xmlns:xacro="http://ros.org/wiki/xacro">>
 
-  <material name="gray">
-    <color rgba="0.5 0.5 0.5 1"/>
-  </material>
-
+  <!-- material definitions. -->
   <material name="red">
-    <color rgba="0.9 0 0 1"/>
+    <color rgba="1.0 0.0 0.0 1.0"/>
   </material>
 
-  <!-- sizes in m. -->
-  <xacro:property name="body_length" value="0.136" /> 
-  <xacro:property name="body_width" value="0.65" />
-  <xacro:property name="body_height" value="0.44" />
+  <xacro:property name="pi" value="3.1415" />
 
-  <xacro:property name="camera_size" value="0.1" />
+  <xacro:property name="body_length" value="0.136" /> 
+  <xacro:property name="body_width" value="0.065" />
+  <xacro:property name="body_height" value="0.044" />
+
+  <xacro:property name="body" value="${body_length} ${body_width} ${body_height}"/>
+  <xacro:property name="off_ground" value="0, ${body_height/2} 0"/>
+
+  <xacro:property name="camera_size" value="0.035" />
   <xacro:property name="camera_offset_x" value="${body_length/2}"/>
   <xacro:property name="camera_offset_z" value="${body_height/2}"/>
 
@@ -22,20 +23,19 @@
   <xacro:property name="body_mass" value="0.249" /> 
 
 
-
-
 <!-- =========================== Base link and inertia link =========================== -->
 
   <link name="base_link">
+    <origin xyz="0.0 0.0 ${body_height/2}"/> <!-- should mean center of geometry? -->
     <visual>
       <geometry>
-        <box size="${body_length} ${body_width} ${body_height}"/>
+        <box size="${body}"/>
       </geometry>
       <material name="gray"/>
     </visual>
      <collision>
       <geometry>
-        <box size="${body_length} ${body_width} ${body_height}"/>
+        <box size="${body}"/>
       </geometry>
     </collision>
   </link>
@@ -48,7 +48,7 @@
   <link name="inertia">
       <visual>
       <geometry>
-        <box size="${body_length} ${body_width} ${body_height}"/>
+        <box size="${body}"/>
       </geometry>
     </visual>
 
@@ -61,15 +61,17 @@
 
   <!--  =========================== camera joint, link and gazebo-cam-sensor =========================== -->
 
-  <joint name="base_to_camera" type="fixed">
+  <joint name="gimbal_pitch" type="revolute">
+    <axis xyz="0 1 0"/>
     <parent link="base_link"/>
-    <child link="camera_link"/>
-    
-    <axis xyz="0 0 0" rpy="0 0 0" />
-    <origin xyz="${camera_offset_x} 0 ${camera_offset_z}" rpy="0 0 0"/>
+    <child link="gimbal_link"/>
+    <origin xyz="${camera_offset_x} 0 ${camera_offset_z}" rpy="0 ${pi/4} 0"/>
+
+    <limit lower="${-(pi/2)}" upper="${pi/2}" effort="30" velocity="1.0"/>
+
   </joint>
 
-   <link name="camera_link">
+   <link name="gimbal_link">
       <collision>
         <origin xyz="0 0 0" rpy="0 0 0"/>
         <geometry>
@@ -92,8 +94,8 @@
       </inertial>
     </link>
 
-  <gazebo reference="camera_link">
-    <sensor type="camera" name="camera1">
+  <gazebo reference="gimbal_link">
+    <sensor type="camera" name="camera_front">
       <update_rate>30.0</update_rate>
       <camera name="head">
         <horizontal_fov>1.3962634</horizontal_fov>
@@ -138,7 +140,5 @@
       <robotNamespace>/biosentry</robotNamespace>
     </plugin>
   </gazebo>
-
-
 
 </robot>
